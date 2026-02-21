@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UOL</title>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --panel:#f02155;
+  --panel-2:#ec1c5e;
+  --ink:#e8edf3;
+  --accent:#2dd4bf;
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  font-family:"Space Mono",monospace;
+  background:#f5f7f7;
+}
+
+/* NAVBAR */
+.navbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:linear-gradient(90deg,#ff2b62,#e3165a);
+  padding:14px 40px;
+  box-shadow:0 8px 25px rgba(0,0,0,.15);
+}
+
+.nav-container{
+  max-width:1200px;
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.nav-logo{
+  font-family:'Orbitron', sans-serif;
+  font-weight:800;
+  font-size:20px;
+  letter-spacing:2px;
+  color:#111;
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:24px;
+  font-family:'Orbitron', sans-serif;
+  font-size:13px;
+  letter-spacing:2px;
+}
+
+.nav-links a{
+  position:relative;
+  text-decoration:none;
+  color:#111;
+  font-weight:700;
+  padding:4px 0;
+  transition:.2s;
+}
+
+/* separator */
+.nav-links a:not(:last-child)::after{
+  content:"|";
+  position:absolute;
+  right:-14px;
+  color:rgba(0,0,0,.4);
+}
+
+/* hover effect */
+.nav-links a:hover{
+  color:#000;
+  text-shadow:0 0 8px rgba(0,0,0,.4);
+}
+
+
+/* MINI STATS BAR */
+.top-stats{
+  display:flex;
+  justify-content:center;
+  gap:80px;
+  padding:18px 0;
+  background:#fff;
+  border-bottom:1px solid #e5e7eb;
+}
+.stat{text-align:center;}
+.stat-label{
+  font-size:12px;
+  letter-spacing:2px;
+  color:#6b7280;
+}
+.stat-number{
+  font-size:24px;
+  font-weight:900;
+  color:#111827;
+}
+
+/* CENTER FORM */
+.site-wrap{
+  min-height:80vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 20px;
+}
+
+.form-card{
+  width:460px;
+  max-width:100%;
+  background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
+  border-radius:24px;
+  box-shadow:0 30px 80px rgba(0,0,0,.15);
+  padding:36px;
+}
+
+.field{
+  background:#0b1220;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+}
+.label{
+  display:block;
+  font-size:12px;
+  opacity:.7;
+  margin-bottom:6px;
+  color:#cbdcf4;
+}
+.input{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:none;
+  color:#fff;
+  font-size:16px;
+}
+.helper{
+  font-size:12px;
+  margin-top:6px;
+  color:#94a3b8;
+}
+
+.counter-actions{
+  display:flex;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.btn{
+  flex:1;
+  border:0;
+  background:#111827;
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+  font-weight:700;
+  text-align:center;
+  text-decoration:none;
+  transition:.2s;
+}
+.btn:hover{
+  background:#1f2937;
+}
+
+.submit{
+  width:100%;
+  background:var(--accent);
+  color:#083246;
+  border:0;
+  padding:14px;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.submit:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.success-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.success-box {
+  background: #000;
+  border: 2px solid #00ff88;
+  padding: 40px;
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  color: #00ff88;
+  box-shadow: 0 0 25px #00ff88;
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.success-box h2 {
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px #00ff88;
+}
+
+.success-box button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  background: #00ff88;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.success-box button:hover {
+  background: #00cc6a;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #0b1220;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+  animation: pop 0.2s ease;
+}
+
+.modal-content.success {
+  border: 2px solid #22c55e;
+}
+
+.modal-content.error {
+  border: 2px solid #ef4444;
+}
+
+.modal-content.error h2 {
+  color: #ef4444;
+}
+
+.modal-content.success h2 {
+  color: #22c55e;
+}
+
+.modal-content button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-content.error button {
+  background: #ef4444;
+  color: white;
+}
+
+.modal-content.success button {
+  background: #22c55e;
+  color: white;
+}
+
+@keyframes pop {
+  from { transform: scale(0.9); opacity: 0 }
+  to { transform: scale(1); opacity: 1 }
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+</style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">UOL</div>
+      <nav class="nav-links">
+        <a href="#">TEASER</a>
+        <a href="#">NFT</a>
+        <a href="#">SHOP</a>
+        <a href="https://x.com/" target="_blank">X</a>
+      </nav>
+    </div>
+  </header>
+  
+<!-- MINI STATS -->
+<div class="top-stats">
+  <div class="stat">
+    <div class="stat-label">USERS</div>
+    <div id="mainCounter" class="stat-number">0</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">UOL</div>
+    <div id="mintCounter" class="stat-number">3333</div>
+  </div>
+</div>
+
+<!-- CENTER FORM -->
+<div class="site-wrap">
+  <div class="form-card">
+    <form id="wlForm" novalidate>
+
+      <div class="field">
+        <label class="label">Your X (Twitter) Username</label>
+        <input class="input" id="username" placeholder="@yourusername" autocomplete="off"/>
+        <div class="helper" id="userHelp"></div>
+      </div>
+
+      <div class="field">
+        <label class="label">Your Wallet Address</label>
+        <input class="input" id="wallet" placeholder="0x000..." autocomplete="off"/>
+        <div class="helper" id="walletHelp"></div>
+      </div>
+
+      <div class="field">
+        <label class="label">Tag friends & paste tweet link</label>
+        <input class="input" id="tweet" placeholder="https://x.com/..." autocomplete="off"/>
+        <div class="helper" id="tweetHelp">We won’t save this—just a check to help prevent spam.</div>
+      </div>
+
+      <div class="counter-actions">
+        <a class="btn" href="https://x.com/intent/follow?screen_name=koro_eths" target="_blank">FOLLOW</a>
+        <a class="btn" href="https://x.com/koro_eths/status/1958142440277475721" target="_blank">LIKE & RT</a>
+      </div>
+
+      <button class="submit" id="submitBtn" type="submit" disabled>Submit</button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* SUPABASE */
+const SUPABASE_URL = "https://ipbszbmrtrnqlfzolobu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwYnN6Ym1ydHJucWxmem9sb2J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NTI1MjQsImV4cCI6MjA4NzIyODUyNH0.5TShRR8xWSzAJof-QYccdiWJ853G7h6bjPYelr126IQ";
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* VALIDATION */
+function isValidUsername(v){ return /^@?[A-Za-z0-9_]{1,15}$/.test(v.trim()); }
+function isValidWallet(v){ return /^0x[a-fA-F0-9]{40}$/.test(v.trim()); }
+function isValidTweet(v){
+  return /https?:\/\/(x\.com|twitter\.com)\/[^\/]+\/status\/\d+/i.test(v.trim());
+}
+
+const username = document.getElementById("username");
+const wallet = document.getElementById("wallet");
+const tweet = document.getElementById("tweet");
+
+const userHelp = document.getElementById("userHelp");
+const walletHelp = document.getElementById("walletHelp");
+const tweetHelp = document.getElementById("tweetHelp");
+const submitBtn = document.getElementById("submitBtn");
+
+function updateValidity(){
+  const uOk = isValidUsername(username.value || "");
+  const wOk = isValidWallet(wallet.value || "");
+  const tOk = isValidTweet(tweet.value || "");
+
+  userHelp.textContent = username.value && !uOk ? "Invalid username." : "";
+  walletHelp.textContent = wallet.value && !wOk ? "Invalid wallet address." : "";
+  tweetHelp.textContent = tweet.value && !tOk ? "Invalid tweet link." : "We won’t save this—just a check to help prevent spam.";
+
+  submitBtn.disabled = !(uOk && wOk && tOk);
+}
+
+username.addEventListener("input", updateValidity);
+wallet.addEventListener("input", updateValidity);
+tweet.addEventListener("input", updateValidity);
+updateValidity();
+
+document.getElementById('wlForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  submitBtn.disabled = true;
+
+  const payload = {
+    username: username.value.startsWith('@') ? username.value : '@'+username.value,
+    wallet: wallet.value
+  };
+
+  try {
+  const { error } = await db.from('UOL').insert([payload]);
+
+  if (error) throw error;
+
+  document.getElementById("successModal").style.display = "flex";
+  e.target.reset();
+
+} catch (err) {
+
+  let message = "Something went wrong. Please try again.";
+
+  if (err.message.includes("unique_wallet")) {
+    message = "This wallet is already registered.";
+  }
+
+  if (err.message.includes("unique_username")) {
+    message = "This username is already registered.";
+  }
+
+  document.getElementById("errorMessage").innerText = message;
+  document.getElementById("errorModal").style.display = "flex";
+
+} finally {
+  submitBtn.disabled = false;
+}
+
+});
+
+/* COUNTER +3 EVERY 2 MIN */
+
+function closeModal() {
+  document.getElementById("successModal").style.display = "none";
+}
+
+function closeErrorModal() {
+  document.getElementById("errorModal").style.display = "none";
+}
+
+
+(function(){
+  const STORAGE_KEY = 'uol_counter_v2';
+  const INTERVAL = 2 * 60 * 1000;
+
+  const mainEl = document.getElementById("mainCounter");
+  const mintEl = document.getElementById("mintCounter");
+
+  function load(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+  function save(v){ localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); }
+
+  let state = load();
+  const now = Date.now();
+
+  if(!state.count){
+    state = { count: 420 + Math.floor(Math.random()*90), last: now };
+  } else {
+    const passed = Math.floor((now - state.last)/INTERVAL);
+    state.count += passed * 3;
+    state.last = now;
+  }
+
+  function render(){
+    mainEl.textContent = state.count;
+    mintEl.textContent = 3333;
+  }
+
+  function tick(){
+    state.count += 3;
+    state.last = Date.now();
+    save(state);
+    render();
+  }
+
+  render();
+  save(state);
+  setInterval(tick, INTERVAL);
+})();
+
+
+</script>
+
+<div id="successModal" class="success-modal">
+  <div class="success-box">
+    <h2>✓ SUBMITTED SUCCESSFULLY</h2>
+    <p>Your entry has been recorded.</p>
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<div id="errorModal" class="modal">
+  <div class="modal-content error">
+    <h2>Submission Failed</h2>
+    <p id="errorMessage">Something went wrong.</p>
+    <button onclick="closeErrorModal()">Close</button>
+  </div>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
