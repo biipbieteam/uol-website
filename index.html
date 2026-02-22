@@ -122,6 +122,30 @@ html,body{
   padding:36px;
 }
 
+  /* HIDE FORM INITIALLY */
+  #formCard {
+  display: none;
+}
+
+/* CTA BUTTON */
+.open-btn{
+  padding:20px 50px;
+  font-size:18px;
+  font-family:'Orbitron', sans-serif;
+  letter-spacing:2px;
+  border:none;
+  border-radius:16px;
+  background:#111827;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.open-btn:hover{
+  background:#000;
+  transform:translateY(-3px);
+}
+
 .field{
   background:#0b1220;
   border-radius:14px;
@@ -316,8 +340,8 @@ html,body{
 <!-- MINI STATS -->
 <div class="top-stats">
   <div class="stat">
-    <div class="stat-label">USERS</div>
-    <div id="mainCounter" class="stat-number">0</div>
+    <div class="stat-label">CHAIN</div>
+    <div id="mintCounter" class="stat-number">BASE</div>
   </div>
   <div class="stat">
     <div class="stat-label">UOL</div>
@@ -327,7 +351,12 @@ html,body{
 
 <!-- CENTER FORM -->
 <div class="site-wrap">
-  <div class="form-card">
+
+  <button id="openFormBtn" class="open-btn">
+    JOIN THE DROP
+  </button>
+
+  <div class="form-card hidden" id="formCard">
     <form id="wlForm" novalidate>
 
       <div class="field">
@@ -485,6 +514,16 @@ function closeErrorModal() {
   save(state);
   setInterval(tick, INTERVAL);
 })();
+
+/* OPEN FORM */
+const openBtn = document.getElementById("openFormBtn");
+const formCard = document.getElementById("formCard");
+
+openBtn.addEventListener("click", () => {
+  formCard.style.display = "block";
+  openBtn.style.display = "none";
+});
+
 
 
 </script>
