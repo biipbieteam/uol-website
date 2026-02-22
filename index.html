@@ -476,45 +476,6 @@ function closeErrorModal() {
   document.getElementById("errorModal").style.display = "none";
 }
 
-
-(function(){
-  const STORAGE_KEY = 'uol_counter_v2';
-  const INTERVAL = 2 * 60 * 1000;
-
-  const mainEl = document.getElementById("mainCounter");
-  const mintEl = document.getElementById("mintCounter");
-
-  function load(){ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
-  function save(v){ localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); }
-
-  let state = load();
-  const now = Date.now();
-
-  if(!state.count){
-    state = { count: 420 + Math.floor(Math.random()*90), last: now };
-  } else {
-    const passed = Math.floor((now - state.last)/INTERVAL);
-    state.count += passed * 3;
-    state.last = now;
-  }
-
-  function render(){
-    mainEl.textContent = state.count;
-    mintEl.textContent = 3333;
-  }
-
-  function tick(){
-    state.count += 3;
-    state.last = Date.now();
-    save(state);
-    render();
-  }
-
-  render();
-  save(state);
-  setInterval(tick, INTERVAL);
-})();
-
 /* OPEN FORM */
 const openBtn = document.getElementById("openFormBtn");
 const formCard = document.getElementById("formCard");
