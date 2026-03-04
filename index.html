@@ -108,9 +108,11 @@ html,body{
 .site-wrap{
   min-height:80vh;
   display:flex;
+  flex-direction:column;   /* QUAN TRỌNG */
   justify-content:center;
   align-items:center;
   padding:40px 20px;
+  gap:20px;                /* tạo khoảng cách */
 }
 
 .form-card{
@@ -321,6 +323,29 @@ html,body{
   to { opacity: 1; transform: scale(1); }
 }
 
+.main-btn {
+  padding:20px 50px;
+  font-size:18px;
+  font-family:'Orbitron', sans-serif;
+  letter-spacing:2px;
+  border:none;
+  border-radius:16px;
+  background:#111827;
+  color:#fff;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.form {
+  margin-top: 30px;
+  padding: 30px;
+  background: #000;
+  border-radius: 20px;
+}
+
+.hidden {
+  display: none;
+}
 </style>
 </head>
 <body>
@@ -349,16 +374,26 @@ html,body{
   </div>
 </div>
 
+<div id="resultModal" class="modal">
+  <div class="modal-box">
+    <p id="modalMessage"></p>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+
 <!-- CENTER FORM -->
 <div class="site-wrap">
 
   <button id="openFormBtn" class="open-btn">
     JOIN THE ADVENTURE
   </button>
+  <!-- WALLET CHECK BUTTON -->
+  <button id="checkBtn" class="main-btn">
+    WALLET CHECKER
+  </button>
 
   <div class="form-card hidden" id="formCard">
     <form id="wlForm" novalidate>
-
       <div class="field">
         <label class="label">Your X (Twitter) Username</label>
         <input class="input" id="username" placeholder="@yourusername" autocomplete="off"/>
@@ -384,6 +419,16 @@ html,body{
 
       <button class="submit" id="submitBtn" type="submit" disabled>Submit</button>
     </form>
+  </div>
+
+  <div class="form-card" id="checkerCard" style="display:none; margin-top:20px;">
+    <div class="field">
+      <label class="label">Enter Wallet Address</label>
+      <input class="input" id="checkWalletInput" placeholder="0x000..." autocomplete="off"/>
+    </div>
+  
+    <button class="submit" id="checkWalletBtn">Check</button>
+  
   </div>
 </div>
 
@@ -434,7 +479,7 @@ document.getElementById('wlForm').addEventListener('submit', async (e) => {
 
   const payload = {
     username: username.value.startsWith('@') ? username.value : '@'+username.value,
-    wallet: wallet.value
+    wallet: wallet.value.toLowerCase()
   };
 
   try {
@@ -476,13 +521,71 @@ function closeErrorModal() {
   document.getElementById("errorModal").style.display = "none";
 }
 
-/* OPEN FORM */
-const openBtn = document.getElementById("openFormBtn");
-const formCard = document.getElementById("formCard");
+const joinBtn = document.getElementById("openFormBtn");
+const checkBtn = document.getElementById("checkBtn");
 
-openBtn.addEventListener("click", () => {
+const formCard = document.getElementById("formCard");
+const checkerCard = document.getElementById("checkerCard");
+
+/* BAN ĐẦU */
+formCard.style.display = "none";
+checkerCard.style.display = "none";
+
+/* CLICK JOIN */
+joinBtn.addEventListener("click", () => {
+
   formCard.style.display = "block";
-  openBtn.style.display = "none";
+  checkerCard.style.display = "none";
+
+  joinBtn.style.display = "none";
+  checkBtn.style.display = "inline-block";
+});
+
+/* CLICK WALLET CHECKER */
+checkBtn.addEventListener("click", () => {
+
+  checkerCard.style.display = "block";
+  formCard.style.display = "none";
+
+  checkBtn.style.display = "none";
+  joinBtn.style.display = "inline-block";
+});
+
+/* WALLET CHECK FUNCTION */
+const checkWalletBtn = document.getElementById("checkWalletBtn");
+const checkWalletInput = document.getElementById("checkWalletInput");
+
+checkWalletBtn.addEventListener("click", async () => {
+
+const walletValue = checkWalletInput.value.trim().toLowerCase();
+
+if (!/^0x[a-fA-F0-9]{40}$/.test(walletValue)) {
+  document.getElementById("errorMessage").innerText = "Invalid wallet format.";
+  document.getElementById("errorModal").style.display = "flex";
+  return;
+}
+
+const { data, error } = await db
+  .from("UOL")
+  .select("wallet")
+  .ilike("wallet", walletValue)
+  .maybeSingle();
+
+if (error) {
+  document.getElementById("errorMessage").innerText = "Error checking wallet.";
+  document.getElementById("errorModal").style.display = "flex";
+  return;
+}
+
+if (data) {
+  document.querySelector("#successModal h2").innerText = "✓ WHITELISTED";
+  document.querySelector("#successModal p").innerText = "This wallet is approved.";
+  document.getElementById("successModal").style.display = "flex";
+} else {
+  document.getElementById("errorMessage").innerText = "This wallet is NOT whitelisted.";
+  document.getElementById("errorModal").style.display = "flex";
+}
+
 });
 
 
