@@ -449,7 +449,7 @@ function App() {
 
                   <a
                     className="quest-action"
-                    href="https://x.com/UOL_eth/status/2091605837319930365?s=20"
+                    href="https://x.com/UOL_eth/status/2092629976361353364?s=20"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -475,7 +475,7 @@ function App() {
 
                   <a
                     className="quest-action"
-                    href="https://x.com/UOL_eth/status/2091605837319930365?s=20"
+                    href="https://x.com/UOL_eth/status/2092629976361353364?s=20"
                     target="_blank"
                     rel="noreferrer"
                   >
